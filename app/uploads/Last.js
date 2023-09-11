@@ -99,7 +99,6 @@ const Last = ({ img, setLast }) => {
     link.click();
     finalImg.current.style.display = "none";
   };
-  console.log(isDownload, "is load");
   return (
     <>
       <div className="container-lg mx-auto h-screen">
