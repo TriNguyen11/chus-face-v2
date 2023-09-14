@@ -12,6 +12,7 @@ import {
   Group,
 } from "react-konva";
 import useImage from "use-image";
+import Dropdown from "../components/Dropdown";
 var faceapi = require("../../face-api.min");
 
 function sleep(ms) {
@@ -25,6 +26,7 @@ const Step3And4 = ({ img, setLast }) => {
   const [selectedId, setSelectedId] = useState();
   const [imgStep3And4, setImgStep3And4] = useState();
   const [isBackInStep4And3, setIsBackInStep4And3] = useState();
+  const [mouseDeselect, setMouseDeselect] = useState();
 
   const refImage = useRef();
   const refImageWrapper = useRef();
@@ -89,13 +91,14 @@ const Step3And4 = ({ img, setLast }) => {
       action: async () => {
         html2canvas(document.getElementById("img-preview-id"), {}).then(
           async (canvas) => {
+            if (mouseDeselect) {
+              const clickedOnEmpty =
+                mouseDeselect.target === mouseDeselect.target.getStage();
+              if (clickedOnEmpty) {
+                setSelectedId(null);
+              }
+            }
             let cvs = document.createElement("canvas").appendChild(canvas);
-            // console.log(cvs, "check cvs");
-            // cvs.style = { rotate: 20 };
-            // let link = document.createElement("a");
-            // link.download = "my-upload-img";
-            // link.href = cvs.toDataURL("image/png");
-            // link.click();
             setImgStep3And4(canvas.toDataURL("image/jpeg"));
             document
               .getElementById("img-preview-id")
@@ -217,6 +220,7 @@ const Step3And4 = ({ img, setLast }) => {
     const previewBlock = document.getElementById("img-preview-id");
     previewBlock.style.position = "relative";
     let imagePreview = previewBlock.getElementsByTagName("img")[0];
+    console.log(imagePreview, "imagePreview");
     const wrapCropper = document.getElementsByClassName("cropper-bg")[0];
     wrapCropper?.remove();
     // // image & canvas
@@ -227,6 +231,9 @@ const Step3And4 = ({ img, setLast }) => {
     const base64Response = await fetch(image);
     const blob = await base64Response.blob();
     imagePreview = await faceapi.bufferToImage(blob);
+    console.log(imagePreview, "imagePreview");
+    imagePreview.style.maxWidth = "80vw";
+    imagePreview.style.maxHeight = "80vw";
     // await sleep(1000);
     // console.log(img, "croppp");
     previewBlock.prepend(imagePreview);
@@ -237,8 +244,8 @@ const Step3And4 = ({ img, setLast }) => {
       width: imagePreview.width,
       height: imagePreview.height,
     };
-    previewBlock.style.width = imagePreview.width + "px";
-    previewBlock.style.height = imagePreview.height + "px";
+    // previewBlock.style.width = imagePreview.width + "px";
+    // previewBlock.style.height = imagePreview.height + "px";
     setSizeCanvas({ width: imagePreview.width, height: imagePreview.height });
     faceapi.matchDimensions(canvas, displaySize);
 
@@ -266,7 +273,6 @@ const Step3And4 = ({ img, setLast }) => {
   //   handleReDetect(img);
   // }, []);
   useEffect(() => {
-    console.log(isBackInStep4And3, "isBackInStep4And3");
     handleReDetect(img);
   }, [isBackInStep4And3]);
   const checkDeselect = (e) => {
@@ -311,19 +317,29 @@ const Step3And4 = ({ img, setLast }) => {
 
   const downloadPcImg = async () => {
     // await pcDownLoad()
-    console.log(finalImg.current.getElementsByTagName("img")[0], "finalImg");
     finalImg.current.style.display = "block";
-    const dataUrl = await htmlToImage.toPng(
-      finalImg.current.getElementsByTagName("img")[0],
-      {
-        cacheBust: true,
-        quality: 0.95,
-        width: 450,
-        height: 450,
-      }
-    );
+    // const dataUrl = await htmlToImage.toPng(
+    //   finalImg.current.getElementsByTagName("img")[0],
+    //   {
+    //     cacheBust: true,
+    //     quality: 0.95,
+    //     width: 450,
+    //     height: 450,
+    //   }
+    // );
+    html2canvas(
+      document.getElementById("img-preview-id").getElementsByTagName("img")[0]
+      // finalImg.current.getElementsByTagName("img")[0]
+    ).then(async (canvas) => {
+      let cvs = document.createElement("canvas").appendChild(canvas);
 
-    download(dataUrl, "my-image.png");
+      let link = document.createElement("a");
+      link.download = "my-upload-img";
+      link.href = cvs.toDataURL("image/jpeg");
+      link.click();
+      // setDegRotate(0);
+    });
+    // download(dataUrl, "my-image.png");
   };
 
   const downloadMbImg = async () => {
@@ -335,13 +351,16 @@ const Step3And4 = ({ img, setLast }) => {
     const cv = document.createElement("canvas").appendChild(mbCanvas);
     const link = document.createElement("a");
     link.download = "chus-mb-img";
-    link.href = cv.toDataURL();
+    link.href = cv.toDataURL("image/png");
     link.click();
     finalImg.current.style.display = "none";
   };
   console.log(step, "ASd");
   return (
     <>
+      <div className="fixed top-4 left-4">
+        <Dropdown />
+      </div>
       <section className="text-center py-10 md:space-y-4 space-y-4 max-[415px]:py-0 mt-10">
         <div className="flex flex-col md:flex-row  items-center justify-center mt-0">
           <p className="md:text-[40px] text-[20px] -mb-4 md:mb-0 md:mt-2 ml-[-40%] sm:ml-0 font-light mr-4">
@@ -363,6 +382,7 @@ const Step3And4 = ({ img, setLast }) => {
           boxShadow:
             " rgba(0, 0, 0, 0.15) 0px 15px 25px, rgba(0, 0, 0, 0.05) 0px 5px 10px",
           maxWidth: 900,
+          backgroundColor: "rgba(254, 251, 240, 0.80)",
         }}>
         <section
           id="section-pro"
@@ -370,9 +390,10 @@ const Step3And4 = ({ img, setLast }) => {
           <div
             ref={finalImg}
             id="img-preview-id"
-            className={` mt-4 relative flex flex-col items-center justify-center mx-auto col-span-7 box-content bg-white md:min-w-[50vh] md:min-h-[50vh] md:w-[50vh] md:h-[50vh] w-[80vw] h-[80vw] `}
+            className={` mt-4 relative flex flex-col items-center justify-center mx-auto col-span-7 box-content bg-white md:min-w-[50vh] md:min-h-[50vh]  `}
             style={{
               objectFit: "contain",
+              OObjectFit: "contain",
             }}>
             <img
               htmlFor="file-input"
@@ -386,12 +407,20 @@ const Step3And4 = ({ img, setLast }) => {
                 // className="top-10"
                 style={{
                   position: "absolute",
+                  top: 0,
+                  left: 0,
                 }}
                 id="container"
                 width={sizeCanvas.width}
                 height={sizeCanvas.height}
-                onMouseDown={checkDeselect}
-                onTouchStart={checkDeselect}>
+                onMouseDown={(e) => {
+                  setMouseDeselect(e);
+                  checkDeselect(e);
+                }}
+                onTouchStart={(e) => {
+                  setMouseDeselect(e);
+                  checkDeselect(e);
+                }}>
                 <Layer>
                   {arrayPos?.map((rect, i) => {
                     return (
@@ -422,15 +451,23 @@ const Step3And4 = ({ img, setLast }) => {
           </div>
         )}
         {step === 3 && (
-          <div className=" mt-4 md:absolute md:right-[0vw] min-[900px]:right-[0] lg:right-[2vw] md:top-[40%]  md:bg-white md:shadow md:rounded-lg grid grid-cols-2 z-10 items-center md:grid-cols-1 md:p-4 gap-4 md:gap-0 flex-wrap">
-            <p className="hidden md:block">EDIT</p>
+          <div className=" mt-4 md:absolute md:right-[0vw] min-[900px]:right-[0] lg:right-[2vw] md:top-[40%]  md:bg-white md:shadow md:rounded-lg grid grid-cols-2 z-10 items-center justify-center md:grid-cols-1 md:p-4 gap-4 md:gap-0 flex-wrap">
+            <p className="hidden md:flex justify-center py-2 px-2 ml-[6px]">
+              EDIT
+            </p>
             {options_edit.map((item, index) => (
               <button
                 type="button"
                 key={item.name}
                 onClick={item.action}
-                className="flex justify-center px-4 py-2 bg-white opacity-80 items-center rounded-full shadow-lg md:shadow-none transition duration-150 ease-in-out focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
-                style={{ WebkitBackdropFilter: "blur(10px)" }}>
+                className="flex justify-center px-4 py-2 bg-white opacity-80 items-center shadow-lg md:shadow-none transition duration-150 ease-in-out focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
+                style={{
+                  WebkitBackdropFilter: "blur(10px)",
+                  borderBottom: `${
+                    index !== options_edit.length - 1 ? "1px" : "0px"
+                  } solid black`,
+                  opacity: 0.5,
+                }}>
                 {/* <div className="flex items-center justify-start">
                   {item.icon}
                 </div> */}
@@ -462,6 +499,7 @@ const Step3And4 = ({ img, setLast }) => {
           </div>
         )}
       </div>
+      <div style={{ height: 100 }}></div>
     </>
   );
 };

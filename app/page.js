@@ -1,5 +1,5 @@
 "use client";
-// import HomePage from "./HomePage";
+import Dropdown from "./components/Dropdown";
 // let img, input, previewBlock, imagePreview, parentCanvas, canvas;
 import dynamic from "next/dynamic";
 
@@ -9,13 +9,16 @@ const NoSSRComponent = dynamic(() => import("./HomePage"), {
 
 export default function Home() {
   return (
-    <div className="container-lg mx-auto flex flex-col h-screen overflow-hidden ">
-      <section className="bg-chushead text-center text-white py-10 space-y-4">
-        <div className="flex justify-center items-end text-3xl ">
-          <span className=" mr-4">PLAY WITH</span>
-          <img className="w-48" src="logo-white.png" />
+    <div className="container-lg mx-auto flex flex-col h-screen overflow-hidden">
+      <div className="absolute top-4 left-4">
+        <Dropdown />
+      </div>
+      <section className="bg-chushead text-center text-white md:py-10 pt-[8vh] pb-[4vh] space-y-4">
+        <div className="flex md:justify-center md:items-end flex-col md:flex-row items-center md:text-3xl text-2xl text-center ">
+          <span className=" md:mr-4 mr-0">PLAY WITH</span>
+          <img className="w-[25vh]" src="logo-white.png" />
         </div>
-        <div className="flex justify-center items-end text-md ">
+        <div className="md:flex justify-center items-end text-md hidden  ">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="33"
@@ -30,15 +33,13 @@ export default function Home() {
           </svg>
           <span
             className="cursor-pointer"
-            onClick={() => {
-              window.location.href = "https://chus.vn/";
-            }}>
+            onClick={() => window.open("https://chus.vn", "_blank")}>
             {" "}
             Shop At CHUS
           </span>
         </div>
       </section>
-      <section className="relative flex justify-around items-center mt-16 px-5">
+      <section className="relative flex md:justify-around flex-col md:flex-row items-center mt-16 px-5">
         <div
           onClick={() => {
             window.location.href = "/text";
@@ -53,7 +54,6 @@ export default function Home() {
           }}>
           <div>
             <p className="text-[12px] md:text-[20px] mt-2 sm:ml-0">Play With</p>
-
             <span className="font-bold relative text-[20px] md:text-[40px] lg:text-[50px] ">
               Your Name
               <img
@@ -80,7 +80,7 @@ export default function Home() {
           onClick={() => {
             window.location.href = "/uploads";
           }}
-          className=" cursor-pointer relative flex flex-col items-center justify-between box-content  w-[35vw] lg:w-[25vw] h-[35vw] lg:h-[25vw]  md:px-8 px-2 py-4 rounded-xl "
+          className=" cursor-pointer relative flex flex-col items-center justify-between box-content w-[35vw] lg:w-[25vw] h-[35vw] lg:h-[25vw]  md:px-8 px-2 py-4 rounded-xl mt-[12vh] md:mt-0 "
           style={{
             boxShadow:
               "rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px",
@@ -113,13 +113,13 @@ export default function Home() {
         style={{}}
         className="flex flex-row justify-center absolute z-[-2] w-[100vw] h-[100vh]">
         <img
-          className="absolute md:bottom-[5vh] bottom-[15vh] max-[415px]:bottom-[5vw]  m-auto w-[60vh] min-w-[250px] max-[800px]:w-[50vh] max-w-[300px] md:max-w-[580px]  z-[-1] opacity-95 object-contain"
+          className="absolute md:bottom-[5vh] bottom-[15vh] max-[415px]:bottom-[35vh]  m-auto w-[60vh] min-w-[200px] max-[800px]:w-[40vh] max-[450px]:w-[20vh]  max-w-[300px] md:max-w-[580px]  z-[-1] md:opacity-95 opacity-30  object-contain"
           src="mascos.png"
         />
       </div>
 
       <img
-        className="absolute md:left-40 left-10 bottom-10 w-20 z-[-3] opacity-75"
+        className="absolute md:left-40 left-[80vw] bottom-[50vh] md:bottom-10 w-20 z-[-3] opacity-50"
         src="ball1.png"
       />
       <img
@@ -127,7 +127,7 @@ export default function Home() {
         src="ball2.png"
       />
       <img
-        className=" absolute -left-10 bottom-60 sm:bottom-40 sm:w-40 w-36 z-[-3] opacity-75"
+        className=" absolute -left-10 bottom-60 sm:bottom-40 sm:w-40 w-36 z-[-4] opacity-75"
         src="ball3.png"
       />
       <img
